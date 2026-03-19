@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VaaniAI+</title>
+</head>
+<body>
+
+<h2>VaaniAI Voice Assistant</h2>
+<button onclick="startListening()">🎤 Speak</button>
+
+<script>
+function startListening() {
+  const recognition = new webkitSpeechRecognition();
+
+  recognition.onresult = async (event) => {
+    const text = event.results[0][0].transcript;
+
+    const res = await fetch("http://localhost:5000/chat", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ message: text })
+    });
+
+    const data = await res.json();
+    alert(data.text);
+  };
+
+  recognition.start();
+}
+</script>
+
+</body>
+</html>
