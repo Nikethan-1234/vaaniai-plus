@@ -7,8 +7,8 @@ app.use(cors());
 app.use(express.json());
 
 // 🔑 PUT YOUR KEYS HERE
-const GEMINI_API_KEY = "AIzaSyDiPvXwId3M2eGZIchq_kODCe6Xp-u-zHw";
-const MURF_API_KEY = "ap2_19286c00-611c-479a-9bd9-27e7a5a6866b";
+const GEMINI_API_KEY = "api";
+const MURF_API_KEY = "api";
 
 // ✅ TEST ROUTE
 app.get("/", (req, res) => {
