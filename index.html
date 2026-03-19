@@ -1,33 +1,98 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>VaaniAI+</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: white;
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 30px;
+    }
+
+    #mic {
+      margin-top: 40px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: purple;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 30px;
+    }
+
+    #response {
+      margin-top: 30px;
+      padding: 20px;
+      font-size: 16px;
+    }
+  </style>
 </head>
+
 <body>
 
-<h2>VaaniAI Voice Assistant</h2>
-<button onclick="startListening()">🎤 Speak</button>
+  <h1>🎤 VaaniAI+</h1>
+  <p>Next-Gen Voice Intelligence System</p>
 
-<script>
-function startListening() {
-  const recognition = new webkitSpeechRecognition();
+  <div id="mic">🎤</div>
 
-  recognition.onresult = async (event) => {
-    const text = event.results[0][0].transcript;
+  <div id="response">Click mic and speak...</div>
 
-    const res = await fetch("http://localhost:5000/chat", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ message: text })
+  <script>
+    const mic = document.getElementById("mic");
+    const responseBox = document.getElementById("response");
+
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "en-US";
+
+    mic.addEventListener("click", () => {
+      recognition.start();
+      responseBox.innerText = "Listening...";
     });
 
-    const data = await res.json();
-    alert(data.text);
-  };
+    recognition.onresult = async (event) => {
+      const transcript = event.results[0][0].transcript;
+      responseBox.innerText = "You: " + transcript;
 
-  recognition.start();
-}
-</script>
+      try {
+        const res = await fetch("http://localhost:3000/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: transcript })
+        });
+
+        const data = await res.json();
+
+        responseBox.innerText += "\n\nAI: " + data.text;
+
+        // 🔥 PLAY AUDIO
+        if (data.audio) {
+          const audio = new Audio(data.audio);
+          audio.play();
+        }
+
+      } catch (err) {
+        responseBox.innerText = "Error connecting to server";
+      }
+    };
+
+    recognition.onerror = () => {
+      responseBox.innerText = "Error using microphone";
+    };
+  </script>
 
 </body>
 </html>
